@@ -21,18 +21,32 @@ public class Main {
 
         public int enterPerson(){
             System.out.println("Введите количество человек (целое, больше 1): ");
+            //данные, оставшиеся в Scanner после считывания
+            String remainedData ="";
 
             while (true){
                 if (scanner.hasNextInt()){
                     person = scanner.nextInt();
+
+                    // Проверяем, остались ли данные в scanner
+                    if (scanner.hasNextLine()) {
+                        remainedData = scanner.nextLine();
+                        if (remainedData.length()>1) {
+                            System.out.println("Введите только число! Введите еще раз:");
+                            continue;
+                        }
+                }
                     if (person<= 1){
                         System.out.println("Число должно быть больше 1! Введите еще раз: ");
                     } else {
                         return person;
                     }
-                } else {
+                } else if (scanner.hasNextDouble()) {
                     System.out.println("Число должно быть целым! Введите еще раз: ");
                     scanner.next();
+                } else if (scanner.hasNextLine()){   //если ввод нач с букв, заканчивается целым числом
+                    System.out.println("Введите только число! Введите еще раз: ");
+                    scanner.nextLine();
                 }
             }
         }//enterPerson
@@ -54,8 +68,16 @@ static class ProcessCreateProduct{
 
             while (true){
                 System.out.println("Введите название товара: ");
-                newName = scanner.next();
+                newName = scanner.nextLine();
+                newName = newName.trim();
+                //проверка на пустую строку или строку из пробелов
+                if (newName.isBlank()){
+                    System.out.println("Вы не можете ввести пустое название товара! ");
+                    continue;
+                }
+
                 boolean flPutProduct = false; //флаг уже положенного товара
+
                 //Если уже есть данный товар в списке
                 if (!productsList.isEmpty()){
                     //ищем его в списке
@@ -63,7 +85,7 @@ static class ProcessCreateProduct{
                         if (item.name.equalsIgnoreCase(newName)){
                             //кладем в список вместе с ценой
                             productsList.add(item);
-                            System.out.println("Товар "+ item.name + " успешно добавлен в корзину");
+                            System.out.println("Товар "+ item.name + " успешно добавлен в корзину. Стоимость товара " + item.price + " " + item.rubles);
                             sum+= item.price;
                             flPutProduct = true;
                             break;
@@ -86,7 +108,7 @@ static class ProcessCreateProduct{
                 System.out.println("Хотите добавить следующий товар?");
                 System.out.println("Для прекращения ввода введите команду: Завершить ");
                 System.out.println("Для продолжения работы нажмите любую клавишу ");
-                String command = scanner.next();
+                String command = scanner.nextLine();
                 if (command.equalsIgnoreCase("Завершить")){
                     return productsList;
                 }
@@ -95,16 +117,26 @@ static class ProcessCreateProduct{
 
     private double getPrice(){
             double number = 0;
+            //данные, оставшиеся в Scanner после считывания
+            String remainedData ="";
 
             while (true){
                 if (scanner.hasNextDouble()){
                     number = scanner.nextDouble();
+                    // Проверяем, остались ли данные в scanner
+                    if (scanner.hasNextLine()) {
+                        remainedData = scanner.nextLine();
+                        if (remainedData.length()>1) {
+                            System.out.println("Введите только число в формате: рубли,копейки! Введите еще раз:");
+                            continue;
+                        }
+                    }
                     if (number <= 0){
                         System.out.println("Цена должна быть больше 0! Введите еще раз: ");
                     } else return number;
-                } else {
-                    System.out.println("Число должно быть в формате: рубли,копейки! Введите еще раз: ");
-                    scanner.next();
+                } else if (scanner.hasNextLine()){   //если ввод нач с букв, заканчивается числом
+                    System.out.println("Введите только число в формате: рубли,копейки! Введите еще раз: ");
+                    scanner.nextLine();
                 }
             }
         }//getPrice
@@ -125,7 +157,7 @@ static class ProcessCreateProduct{
             FormatRubles format = new FormatRubles();
             String rubl = format.formatRubles(amount);
 
-            System.out.println("Общая цена: " + sum);
+            System.out.println(String.format("Общая цена: %.2f", sum));
             System.out.println(String.format("Каждый человек должен заплатить: %.2f %s",amount,rubl));
     }//calculateAndPrint
 
